@@ -1,7 +1,25 @@
-import { movies } from './../data.js';
+import { useSelector } from "react-redux";
+import { useEffect, useState } from "react";
 
-export default function Movie(props) {
-  const movie = movies[props.sira];
+export default function Movie({ sira }) {
+  const movies = useSelector((state) => state.movies);
+  const favMovies = useSelector((state) => state.favMovies);
+
+  const filteredMovies = movies.filter(
+    (movie) => !favMovies.some((fav) => fav.id === movie.id)
+  );
+
+  const [movie, setMovie] = useState(null);
+
+  useEffect(() => {
+    if (filteredMovies.length > 0 && sira < filteredMovies.length) {
+      setMovie(filteredMovies[sira]);
+    } else {
+      setMovie(null);
+    }
+  }, [filteredMovies, sira]);
+
+  if (!movie) return <div className="text-center">Gösterilecek film kalmadı</div>;
 
   return (
     <div className="flex bg-white shadow-lg items-start">
@@ -13,9 +31,9 @@ export default function Movie(props) {
       <div className="p-8 flex flex-col gap-4 text-sm">
         <div>
           <h2 className="text-2xl">{movie.title}</h2>
-          <p className="italic text-sm">{movie.genres.join(', ')}</p>
+          <p className="italic text-sm">{movie.genres.join(", ")}</p>
         </div>
-        <p className="">{movie.plot}</p>
+        <p>{movie.plot}</p>
         <div className="flex flex-col sm:flex-row">
           <span className="w-1/3 font-bold">Yönetmen</span>
           <span className="flex-1">{movie.director}</span>
